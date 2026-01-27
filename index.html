@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>體重紀錄助手</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1a73e8; margin-bottom: 25px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 15px; background: #1a73e8; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #status { text-align: center; margin-top: 15px; color: #28a745; display: none; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>⚖️ 體重紀錄助手</h2>
+    <div class="input-group"><label>日期</label><input type="date" id="d"></div>
+    <div class="input-group"><label>體重 (kg)</label><input type="number" id="w" step="0.1" placeholder="70.0"></div>
+    <div class="input-group"><label>備註</label><input type="text" id="n"></div>
+    <button onclick="s()" id="b">確認儲存</button>
+    <div id="status">✅ 已同步至 Google 表格！</div>
+</div>
+<script>
+    document.getElementById('d').valueAsDate = new Date();
+    function s() {
+        const u = 'https://script.google.com/macros/s/AKfycbxRUK-sMAaP-4aOEEBXon9BfVcvi5YLq_LW9t3bKngABt6NqvtMtZLocrVEgjjOA4d3/exec';
+        const btn = document.getElementById('b'), st = document.getElementById('status');
+        const data = { date: document.getElementById('d').value, weight: document.getElementById('w').value, note: document.getElementById('n').value };
+        if (!data.weight) return alert('請輸入體重');
+        btn.disabled = true; btn.innerText = "傳送中...";
+        fetch(u, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+        .then(() => {
+            st.style.display = 'block'; btn.innerText = "確認儲存"; btn.disabled = false;
+            document.getElementById('w').value = ''; setTimeout(() => { st.style.display = 'none' }, 3000);
+        });
+    }
+</script>
+</body>
+</html>
