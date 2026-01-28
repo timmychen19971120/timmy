@@ -3,126 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Timmy Weight Tracker</title>
+    <title>Timmy Life Hub</title>
     <style>
-        :root {
-            --primary-color: #4facfe;
-            --secondary-color: #00f2fe;
-            --bg-color: #f8f9fa;
-            --text-color: #2d3436;
-        }
-        body { 
-            margin: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg-color); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-        }
-        .card { 
-            background: white; 
-            width: 90%; 
-            max-width: 380px; 
-            padding: 30px; 
-            border-radius: 30px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05); 
-            text-align: center;
-        }
-        .icon-circle {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-size: 30px;
-            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
-        }
-        h2 { margin: 0 0 30px; color: var(--text-color); font-weight: 700; letter-spacing: -1px; }
-        .input-group { text-align: left; margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #b2bec3; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-left: 5px; }
-        input { 
-            width: 100%; 
-            padding: 15px; 
-            border: 2px solid #f1f3f5; 
-            border-radius: 15px; 
-            box-sizing: border-box; 
-            font-size: 16px; 
-            background: #f1f3f5;
-            transition: all 0.3s ease;
-        }
-        input:focus { outline: none; border-color: var(--primary-color); background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
-        button { 
-            width: 100%; 
-            padding: 18px; 
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
-            color: white; 
-            border: none; 
-            border-radius: 18px; 
-            font-size: 18px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            margin-top: 10px; 
-            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.2);
-            transition: transform 0.2s ease;
-        }
-        button:active { transform: scale(0.98); }
-        button:disabled { background: #dfe6e9; box-shadow: none; color: #b2bec3; }
-        #status { 
-            margin-top: 20px; 
-            font-size: 14px; 
-            color: #00b894; 
-            font-weight: 600;
-            display: none; 
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        :root { --p: #6c5ce7; --bg: #fdfbff; }
+        body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg); color: #2d3436; }
+        .nav { display: flex; justify-content: space-around; background: white; padding: 15px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); position: fixed; bottom: 0; width: 100%; }
+        .nav-item { font-size: 12px; color: #b2bec3; text-align: center; cursor: pointer; }
+        .nav-item.active { color: var(--p); font-weight: bold; }
+        .container { padding: 20px; padding-bottom: 100px; max-width: 500px; margin: auto; }
+        .page { display: none; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        h2 { margin: 0 0 20px; font-size: 20px; }
+        label { display: block; font-size: 13px; color: #636e72; margin-bottom: 8px; }
+        input { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; box-sizing: border-box; font-size: 16px; margin-bottom: 15px; }
+        .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .tag-btn { padding: 10px 5px; border: 1px solid #eee; border-radius: 10px; font-size: 13px; text-align: center; background: white; cursor: pointer; }
+        .tag-btn.active { border-color: #ff7675; color: #ff7675; background: #fff5f5; }
+        .water-cup { font-size: 40px; text-align: center; padding: 20px; cursor: pointer; filter: grayscale(1); transition: 0.3s; }
+        .water-cup.filled { filter: grayscale(0); transform: scale(1.1); }
+        .submit-btn { width: 100%; padding: 15px; background: #2d3436; color: white; border: none; border-radius: 15px; font-size: 16px; font-weight: bold; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="icon-circle">⚖️</div>
-    <h2>我的體重日記</h2>
-    
-    <div class="input-group">
-        <label>測量日期</label>
-        <input type="date" id="d">
+<div class="container">
+    <div id="weight-page" class="page active">
+        <h2>⚖️ 體重紀錄</h2>
+        <div class="card">
+            <label>日期</label><input type="date" id="w-date">
+            <label>體重 (kg)</label><input type="number" id="w-val" step="0.1">
+            <button class="submit-btn" onclick="save('Weight')">儲存體重</button>
+        </div>
     </div>
-    
-    <div class="input-group">
-        <label>目前體重 (kg)</label>
-        <input type="number" id="w" step="0.1" placeholder="0.0" inputmode="decimal">
+
+    <div id="water-page" class="page">
+        <h2>💧 喝水紀錄 (500cc/杯)</h2>
+        <div class="card">
+            <div style="display: flex; justify-content: space-around;">
+                <div class="water-cup" onclick="toggleWater(this)">🥛</div>
+                <div class="water-cup" onclick="toggleWater(this)">🥛</div>
+                <div class="water-cup" onclick="toggleWater(this)">🥛</div>
+                <div class="water-cup" onclick="toggleWater(this)">🥛</div>
+            </div>
+            <p id="water-count" style="text-align: center; color: #0984e3;">目前完成：0 杯 (0cc)</p>
+            <button class="submit-btn" onclick="save('Water')">完成紀錄</button>
+        </div>
     </div>
-    
-    <div class="input-group">
-        <label>心情或備註</label>
-        <input type="text" id="n" placeholder="今天狀態如何？">
+
+    <div id="drinks-page" class="page">
+        <h2>🧋 飲料筆記</h2>
+        <div class="card">
+            <label>日期</label><input type="date" id="d-date">
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="d-store" placeholder="店家">
+                <input type="text" id="d-item" placeholder="品名">
+            </div>
+            <label>甜度</label>
+            <div class="btn-grid" id="sugar-group">
+                <div class="tag-btn" onclick="sel(this,'sugar')">無糖</div>
+                <div class="tag-btn" onclick="sel(this,'sugar')">一分</div>
+                <div class="tag-btn" onclick="sel(this,'sugar')">微糖</div>
+                <div class="tag-btn" onclick="sel(this,'sugar')">半糖</div>
+            </div>
+            <label>冰塊</label>
+            <div class="btn-grid" id="ice-group">
+                <div class="tag-btn" onclick="sel(this,'ice')">去冰</div>
+                <div class="tag-btn" onclick="sel(this,'ice')">微冰</div>
+                <div class="tag-btn" onclick="sel(this,'ice')">少冰</div>
+                <div class="tag-btn" onclick="sel(this,'ice')">正常</div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="d-rate" placeholder="評分 (1-5)">
+                <input type="number" id="d-price" placeholder="價格">
+            </div>
+            <button class="submit-btn" onclick="save('Drinks')">儲存飲料</button>
+        </div>
     </div>
-    
-    <button onclick="s()" id="b">儲存紀錄</button>
-    <div id="status">✨ 數據已同步至雲端</div>
+</div>
+
+<div class="nav">
+    <div class="nav-item active" onclick="show('weight')">⚖️<br>體重</div>
+    <div class="nav-item" onclick="show('water')">💧<br>喝水</div>
+    <div class="nav-item" onclick="show('drinks')">🧋<br>飲料</div>
 </div>
 
 <script>
-    document.getElementById('d').valueAsDate = new Date();
-    function s() {
-        const u = 'https://script.google.com/macros/s/AKfycbxRUK-sMAaP-4aOEEBXon9BfVcvi5YLq_LW9t3bKngABt6NqvtMtZLocrVEgjjOA4d3/exec';
-        const btn = document.getElementById('b'), st = document.getElementById('status');
-        const data = { date: document.getElementById('d').value, weight: document.getElementById('w').value, note: document.getElementById('n').value };
-        if (!data.weight) return alert('請輸入體重！');
-        btn.disabled = true; btn.innerText = "正在儲存...";
-        fetch(u, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
-        .then(() => {
-            st.style.display = 'block'; btn.innerText = "儲存紀錄"; btn.disabled = false;
-            document.getElementById('w').value = ''; setTimeout(() => { st.style.display = 'none' }, 3000);
-        });
+    const API = '你的GAS網址'; // 務必貼上你的網址
+    document.querySelectorAll('input[type="date"]').forEach(i => i.valueAsDate = new Date());
+
+    function show(p) {
+        document.querySelectorAll('.page, .nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(p + '-page').classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function sel(el, group) {
+        el.parentElement.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function toggleWater(el) {
+        el.classList.toggle('filled');
+        const count = document.querySelectorAll('.water-cup.filled').length;
+        document.getElementById('water-count').innerText = `目前完成：${count} 杯 (${count*500}cc)`;
+    }
+
+    function save(type) {
+        let payload = { type: type, date: new Date().toLocaleDateString() };
+        if(type === 'Weight') {
+            payload.weight = document.getElementById('w-val').value;
+        } else if(type === 'Water') {
+            payload.cups = document.querySelectorAll('.water-cup.filled').length;
+        } else if(type === 'Drinks') {
+            payload.store = document.getElementById('d-store').value;
+            payload.item = document.getElementById('d-item').value;
+            payload.sugar = document.querySelector('#sugar-group .active')?.innerText || '';
+            payload.ice = document.querySelector('#ice-group .active')?.innerText || '';
+            payload.rating = document.getElementById('d-rate').value;
+            payload.price = document.getElementById('d-price').value;
+        }
+
+        fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+        .then(() => alert(type + ' 紀錄成功！'));
     }
 </script>
-
 </body>
 </html>
