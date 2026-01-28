@@ -26,7 +26,7 @@
         
         /* 飲料分頁專用標籤 */
         .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
-        .tag-btn { padding: 10px 5px; border: 1px solid #eee; border-radius: 10px; font-size: 12px; text-align: center; background: white; }
+        .tag-btn { padding: 10px 5px; border: 1px solid #eee; border-radius: 10px; font-size: 12px; text-align: center; background: white; cursor: pointer;}
         .tag-btn.active { border-color: #ff7675; color: #ff7675; background: #fff5f5; }
 
         /* 水杯樣式 */
@@ -34,7 +34,7 @@
         .cup { font-size: 50px; text-align: center; filter: grayscale(1); transition: 0.3s; cursor: pointer; }
         .cup.filled { filter: grayscale(0); transform: scale(1.1); }
 
-        .submit-btn { width: 100%; padding: 18px; background: #2d3436; color: white; border: none; border-radius: 18px; font-size: 18px; font-weight: bold; margin-top: 20px; }
+        .submit-btn { width: 100%; padding: 18px; background: #2d3436; color: white; border: none; border-radius: 18px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer;}
         .back-btn { background: none; border: none; color: var(--p); font-weight: bold; margin-bottom: 20px; cursor: pointer; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -58,7 +58,7 @@
             <h2>⚖️ 體重紀錄</h2>
             <label>日期</label><input type="date" id="w-date">
             <label>體重 (kg)</label><input type="number" id="w-val" step="0.1" inputmode="decimal">
-            <button class="submit-btn" onclick="save('Weight')">儲存紀錄</button>
+            <button class="submit-btn" onclick="save('Weight', this)">儲存紀錄</button>
         </div>
     </div>
 
@@ -73,7 +73,7 @@
                 <div class="cup" onclick="this.classList.toggle('filled')">🥛</div>
             </div>
             <p style="text-align:center; color:#636e72">點擊杯子紀錄 (500cc/杯)</p>
-            <button class="submit-btn" onclick="save('Water')">儲存紀錄</button>
+            <button class="submit-btn" onclick="save('Water', this)">儲存紀錄</button>
         </div>
     </div>
 
@@ -96,14 +96,16 @@
                 <div class="tag-btn" onclick="sel(this)">去冰</div><div class="tag-btn" onclick="sel(this)">微冰</div>
                 <div class="tag-btn" onclick="sel(this)">少冰</div><div class="tag-btn" onclick="sel(this)">正常</div>
             </div>
-            <button class="submit-btn" onclick="save('Drinks')">儲 stored 紀錄</button>
+            <button class="submit-btn" onclick="save('Drinks', this)">儲存紀錄</button>
         </div>
     </div>
 </div>
 
 <script>
-    // https://script.google.com/macros/s/AKfycbwr9SHlk8Xq9VZrRftjgPY7VOqjfOJEsUoB1ucucTsgrWeoznbHLxi2kK3-fo_RVoM_/exec
     const API = 'https://script.google.com/macros/s/AKfycbxRUK-sMAaP-4aOEEBXon9BfVcvi5YLq_LW9t3bKngABt6NqvtMtZLocrVEgjjOA4d3/exec';
+
+    // 初始化日期
+    document.querySelectorAll('input[type="date"]').forEach(i => i.valueAsDate = new Date());
 
     function showPage(p) {
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
@@ -115,25 +117,50 @@
         el.classList.add('active');
     }
 
-    function save(type) {
-        let data = { type: type, date: new Date().toLocaleDateString() };
-        if(type === 'Weight') data.weight = document.getElementById('w-val').value;
-        if(type === 'Water') data.cups = document.querySelectorAll('.cup.filled').length;
+    function save(type, btnElement) {
+        // 使用 ISO 日期避免解析錯誤
+        let today = new Date();
+        let dateStr = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+        
+        let data = { type: type, date: dateStr };
+        
+        if(type === 'Weight') {
+            data.weight = document.getElementById('w-val').value;
+            if(!data.weight) return alert('請輸入體重');
+        }
+        if(type === 'Water') {
+            data.cups = document.querySelectorAll('#water-page .cup.filled').length;
+        }
         if(type === 'Drinks') {
             data.store = document.getElementById('d-store').value;
             data.item = document.getElementById('d-item').value;
-            data.sugar = document.querySelector('#sugar-group .active')?.innerText;
-            data.ice = document.querySelector('#ice-group .active')?.innerText;
+            data.sugar = document.querySelector('#sugar-group .active')?.innerText || '無';
+            data.ice = document.querySelector('#ice-group .active')?.innerText || '無';
+            if(!data.store || !data.item) return alert('請輸入店家與品名');
         }
 
-        const btn = event.target;
-        btn.disabled = true; btn.innerText = "傳送中...";
+        btnElement.disabled = true;
+        btnElement.innerText = "傳送中...";
 
-        fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+        fetch(API, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data) 
+        })
         .then(() => {
             alert('✅ 儲存成功！');
-            btn.disabled = false; btn.innerText = "儲存紀錄";
+            btnElement.disabled = false;
+            btnElement.innerText = "儲存紀錄";
+            // 清空體重與杯子
+            if(type === 'Weight') document.getElementById('w-val').value = '';
+            if(type === 'Water') document.querySelectorAll('.cup').forEach(c => c.classList.remove('filled'));
             showPage('home');
+        })
+        .catch(err => {
+            alert('❌ 儲存失敗，請檢查網路');
+            btnElement.disabled = false;
+            btnElement.innerText = "儲存紀錄";
         });
     }
 </script>
