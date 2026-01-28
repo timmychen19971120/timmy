@@ -30,9 +30,45 @@
         .tag-btn.active { border-color: #ff7675; color: #ff7675; background: #fff5f5; }
 
         /* 水杯樣式 */
-        .water-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 0; }
-        .cup { font-size: 50px; text-align: center; filter: grayscale(1); transition: 0.3s; cursor: pointer; }
-        .cup.filled { filter: grayscale(0); transform: scale(1.1); }
+        /* 1. 優化水杯樣式：點擊更有感 */
+        .water-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px; 
+            padding: 20px 0; 
+            justify-items: center;
+        }
+        .cup-box {
+            width: 60px;
+            height: 80px;
+            border: 4px solid #dfe6e9;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        /* 杯子裡的水 */
+        .cup-box::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%; /* 預設是空的 */
+            background: linear-gradient(to top, #0984e3, #74b9ff);
+            transition: height 0.4s ease;
+        }
+        /* 點擊後的狀態 */
+        .cup-box.filled {
+            border-color: #0984e3;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(9, 132, 227, 0.2);
+        }
+        .cup-box.filled::after {
+            height: 100%; /* 填滿水 */
+        }
 
         .submit-btn { width: 100%; padding: 18px; background: #2d3436; color: white; border: none; border-radius: 18px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer;}
         .back-btn { background: none; border: none; color: var(--p); font-weight: bold; margin-bottom: 20px; cursor: pointer; }
@@ -67,12 +103,17 @@
         <div class="card">
             <h2>💧 今日喝水</h2>
             <div class="water-grid">
-                <div class="cup" onclick="this.classList.toggle('filled')">🥛</div>
-                <div class="cup" onclick="this.classList.toggle('filled')">🥛</div>
-                <div class="cup" onclick="this.classList.toggle('filled')">🥛</div>
-                <div class="cup" onclick="this.classList.toggle('filled')">🥛</div>
+                <div id="water-page" class="page">
+        <button class="back-btn" onclick="showPage('home')">← 返回主頁</button>
+        <div class="card">
+            <h2>💧 今日喝水</h2>
+            <div class="water-grid">
+                <div class="cup-box" onclick="this.classList.toggle('filled')"></div>
+                <div class="cup-box" onclick="this.classList.toggle('filled')"></div>
+                <div class="cup-box" onclick="this.classList.toggle('filled')"></div>
+                <div class="cup-box" onclick="this.classList.toggle('filled')"></div>
             </div>
-            <p style="text-align:center; color:#636e72">點擊杯子紀錄 (500cc/杯)</p>
+            <p style="text-align:center; color:#636e72; margin-top: 20px;">點擊杯子紀錄 (500cc/杯)</p>
             <button class="submit-btn" onclick="save('Water', this)">儲存紀錄</button>
         </div>
     </div>
@@ -129,8 +170,8 @@
             if(!data.weight) return alert('請輸入體重');
         }
         if(type === 'Water') {
-            data.cups = document.querySelectorAll('#water-page .cup.filled').length;
-        }
+            data.cups = document.querySelectorAll('#water-page .cup-box.filled').length;
+}
         if(type === 'Drinks') {
             data.store = document.getElementById('d-store').value;
             data.item = document.getElementById('d-item').value;
